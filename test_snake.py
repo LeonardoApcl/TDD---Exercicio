@@ -23,7 +23,7 @@ def test_snake_move_right():
     assert len(player.body) == 2         # O tamanho deve continuar o mesmo
     assert player.body[-1] == (5, 5)     # O corpo antigo (4,5) sumiu, o novo é (5,5)
 
-#Teste (Red)
+#Teste (Green)
 def test_snake_move_up():
     # Arrange
     player = Snake(start_x=5, start_y=5) # Corpo inicial: [(5,5), (5,4)]
