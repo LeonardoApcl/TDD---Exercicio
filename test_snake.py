@@ -10,7 +10,7 @@ def test_snake_initialization():
     assert len(player.body) == 2
     assert player.direction == 'd'
 
-#Teste (Red)
+#Teste (Green)
 def test_snake_move_right():
     # Arrange
     player = Snake(start_x=5, start_y=5) # Corpo inicial: [(5,5), (5,4)]
