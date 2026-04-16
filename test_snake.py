@@ -9,3 +9,16 @@ def test_snake_initialization():
     # Assert
     assert len(player.body) == 2
     assert player.direction == 'd'
+
+#Teste (Red)
+def test_snake_move_right():
+    # Arrange
+    player = Snake(start_x=5, start_y=5) # Corpo inicial: [(5,5), (5,4)]
+    
+    # Act
+    player.move('d', max_x=10, max_y=10) 
+    
+    # Assert
+    assert player.body[0] == (5, 6)      # A cabeça deve ir para a direita (x+1)
+    assert len(player.body) == 2         # O tamanho deve continuar o mesmo
+    assert player.body[-1] == (5, 5)     # O corpo antigo (5,4) sumiu, o novo é (5,5)
