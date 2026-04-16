@@ -19,6 +19,6 @@ def test_snake_move_right():
     player.move('d', max_x=10, max_y=10) 
     
     # Assert
-    assert player.body[0] == (5, 6)      # A cabeça deve ir para a direita (x+1)
+    assert player.body[0] == (6, 5)      # A cabeça deve ir para a direita (x+1)
     assert len(player.body) == 2         # O tamanho deve continuar o mesmo
-    assert player.body[-1] == (5, 5)     # O corpo antigo (5,4) sumiu, o novo é (5,5)
+    assert player.body[-1] == (5, 5)     # O corpo antigo (4,5) sumiu, o novo é (5,5)
