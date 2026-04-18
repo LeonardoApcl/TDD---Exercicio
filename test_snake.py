@@ -190,7 +190,7 @@ def test_process_turn_game_over_on_self_collision():
 
     assert game_over == True
 
-#Teste (Red)
+#Teste (Green)
 def test_process_turn_game_over_on_input():
     player = Snake(start_x=5, start_y=5)
     instance = io_handler((10, 10), 0.5)
@@ -200,3 +200,14 @@ def test_process_turn_game_over_on_input():
     game_over = process_turn(player, instance, fruit_pos=(0, 0))
 
     assert game_over == True
+
+#Teste (Red)
+def test_process_turn_growth():
+    player = Snake(start_x=5, start_y=5)
+    instance = io_handler((10, 10), 0.5)
+    
+    instance.last_input = 'd' # Move para a direita
+
+    game_over = process_turn(player, instance, fruit_pos=(6, 5)) # A fruta está na posição para onde a cabeça vai se mover
+
+    assert player.grow_pending == True # A cobra deve ter a flag de crescimento ativada
