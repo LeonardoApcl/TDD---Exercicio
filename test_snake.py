@@ -101,7 +101,7 @@ def test_snake_input_validation():
     assert player.direction == 'd' # Deve ignorar o input inválido e continuar na direção atual
     assert player.body[0] == (6, 5) # Deve ter andado para a direita normalmente
 
-#Teste (Green) - Teste para crescimento da cobra (ainda não implementado)
+#Teste (Green) - Teste para crescimento da cobra
 def test_snake_growth():
     player = Snake(start_x=5, start_y=5)
 
@@ -111,8 +111,18 @@ def test_snake_growth():
     assert len(player.body) == 3 # Espera que o corpo cresça para 3 segmentos
     assert player.body == [(6, 5), (5, 5), (4, 5)] # Espera que o novo segmento seja adicionado na posição do antigo rabo (4,5)
 
-#Teste (Red) - Testa colisão da cobra consigo mesma (ainda não implementado)
+#Teste (Red) - Testa colisão da cobra consigo mesma
 def test_snake_no_collision_start():
     player = Snake(start_x=5, start_y=5)
     # Uma cobra nova nunca deve estar em colisão
     assert player.check_collision() == False
+
+#Teste (Red) - Testa colisão da cobra consigo mesma
+def test_snake_self_collision():
+    player = Snake(start_x=5, start_y=5)
+    # Simulamos uma cobra grande enrolada em si mesma 
+    # (a cabeça (5,5) está ocupando o mesmo espaço que a ponta do rabo)
+    player.body = [(5, 5), (5, 6), (6, 6), (6, 5), (5, 5)] 
+    
+    assert player.check_collision() == True
+
