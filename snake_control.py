@@ -10,8 +10,17 @@ class Snake:
             'd': (1, 0)
         }
 
+        self.opposites = {
+            'w': 's',
+            's': 'w',
+            'a': 'd',
+            'd': 'a'
+        }
+
     def move(self, user_input, max_x, max_y):
-        self.direction = user_input
+
+        if user_input != self.opposites.get(self.direction):
+            self.direction = user_input
 
         head_x, head_y = self.body[0]
         d_x, d_y = self.directions[self.direction]
