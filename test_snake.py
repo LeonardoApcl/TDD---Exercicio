@@ -126,3 +126,17 @@ def test_snake_self_collision():
     
     assert player.check_collision() == True
 
+#Teste (Red) - Testa a regra de frutas permitidas com base no tamanho da cobra
+def test_allowed_fruits_rule():
+    player = Snake(start_x=5, start_y=5)
+    
+    # Cobra iniciante (tamanho 2) -> 1 fruta
+    assert player.get_allowed_fruits() == 1
+    
+    # Simulamos uma cobra com tamanho exato de 10 -> 2 frutas
+    player.body = [(0,0)] * 10
+    assert player.get_allowed_fruits() == 2
+    
+    # Simulamos uma cobra com tamanho de 25 -> 3 frutas
+    player.body = [(0,0)] * 25
+    assert player.get_allowed_fruits() == 3
