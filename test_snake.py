@@ -1,6 +1,6 @@
 import pytest
 from snake_control import Snake
-from snake_screen import io_handler, process_turn
+from snake_screen import io_handler, process_turn, manage_fruits
 
 #Teste (Green)
 def test_snake_initialization():
@@ -211,3 +211,22 @@ def test_process_turn_growth():
     game_over = process_turn(player, instance, fruit_list=[(6, 5)]) # A fruta está na posição para onde a cabeça vai se mover
 
     assert player.grow_pending == True # A cobra deve ter a flag de crescimento ativada
+
+#Teste (Red)
+def test_manage_fruits_respects_allowed_rule():
+    # Arrange
+    player = Snake(start_x=5, start_y=5) 
+    
+    # Simulamos que a cobra cresceu até o tamanho 10 (A regra diz que agora ela tem direito a 2 frutas)
+    player.body = [(x, 0) for x in range(10)] 
+    assert player.get_allowed_fruits() == 2 # Só pra garantir que a regra matemática funciona
+    
+    # A lista de frutas atual só tem 1 fruta, mas a regra permite 2.
+    fruit_list = [(1, 1)]
+    
+    # Act
+    manage_fruits(player, fruit_list, max_x=10, max_y=10)
+    
+    # Assert
+    # A função deve ter gerado e adicionado +1 fruta nova na lista
+    assert len(fruit_list) == 2
