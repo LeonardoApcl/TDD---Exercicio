@@ -71,3 +71,21 @@ def test_snake_ignore_opposite_direction():
     
     assert player.direction == 'd'       # Deve ignorar e continuar para direita
     assert player.body[0] == (6, 5)      # Deve ter andado para a direita normalmente
+
+#Teste (Red) - Testa comportamento de movimento para fora dos limites do mapa
+def test_snake_move_out_of_bounds():
+    player = Snake(start_x=9, start_y=5) # Começa perto da borda direita do mapa
+    
+    player.move('d', max_x=10, max_y=10) # Tenta mandar para direita (na parede)
+    
+    assert player.body[0] == (0, 5)      # A cabeça deve reaparecer na borda esquerda (x=0)
+    assert len(player.body) == 2         # O tamanho continua sendo 2
+    assert player.body[-1] == (9, 5)     # A antiga cabeça (9,5) agora é o corpo
+
+    player = Snake(start_x=5, start_y=0) # Começa perto da borda superior do mapa
+
+    player.move('w', max_x=10, max_y=10) # Tenta mandar para cima (na parede)
+
+    assert player.body[0] == (5, 9)      # A cabeça deve reaparecer na borda inferior (y=9)
+    assert len(player.body) == 2         # O tamanho continua sendo 2
+    assert player.body[-1] == (5, 0)     # A antiga cabeça (5,0) agora é o corpo
