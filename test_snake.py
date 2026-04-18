@@ -61,3 +61,12 @@ def test_snake_move_left():
     assert player.body[0] == (4, 5)      # A cabeça deve ir para a esquerda (x-1)
     assert len(player.body) == 2         # O tamanho deve continuar o mesmo
     assert player.body[-1] == (5, 5)     # O corpo antigo (4,5) sumiu, o novo é (5,5)
+
+#Teste (Red)
+def test_snake_ignore_opposite_direction():
+    player = Snake(start_x=5, start_y=5) # Começa virada para direita ('d')
+    
+    player.move('a', max_y=10, max_x=10) # Tenta mandar para a esquerda (ré)
+    
+    assert player.direction == 'd'       # Deve ignorar e continuar para direita
+    assert player.body[0] == (5, 6)      # Deve ter andado para a direita normalmente
