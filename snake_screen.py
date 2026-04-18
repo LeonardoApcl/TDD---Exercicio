@@ -65,6 +65,9 @@ class io_handler:
 def process_turn(snake, display_handler, fruit_pos):
     snake.move(display_handler.last_input, display_handler.x_size, display_handler.y_size)
 
+    fruit_x, fruit_y = fruit_pos
+    display_handler.matrix[fruit_y][fruit_x] = 3 # Marca a fruta na posição correta
+
     for index, part in enumerate(snake.body):
         p_x, p_y = part
         if index == 0:
