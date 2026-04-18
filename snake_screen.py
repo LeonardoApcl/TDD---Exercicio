@@ -62,8 +62,17 @@ class io_handler:
 #instance.matrix[0][1] = 2 #cabeça
 #instance.matrix[0][2] = 3 #fruta
 
-def process_turn(snake, display_handler):
-    return True
+def process_turn(snake, display_handler, fruit_pos):
+    snake.move(display_handler.last_input, display_handler.x_size, display_handler.y_size)
+
+    for index, part in enumerate(snake.body):
+        p_x, p_y = part
+        if index == 0:
+            display_handler.matrix[p_y][p_x] = 2 # Cabeça
+        else:
+            display_handler.matrix[p_y][p_x] = 1 # Corpo
+
+    return False
 
 def game_loop():
     instance = io_handler((10,10), 0.5)
@@ -78,5 +87,3 @@ def game_loop():
             break
         instance.display()
         time.sleep(instance.game_speed)
-
-game_loop()
