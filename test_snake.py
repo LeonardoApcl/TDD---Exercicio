@@ -212,7 +212,7 @@ def test_process_turn_growth():
 
     assert player.grow_pending == True # A cobra deve ter a flag de crescimento ativada
 
-#Teste (Red)
+#Teste (Green)
 def test_manage_fruits_respects_allowed_rule():
     # Arrange
     player = Snake(start_x=5, start_y=5) 
@@ -230,3 +230,18 @@ def test_manage_fruits_respects_allowed_rule():
     # Assert
     # A função deve ter gerado e adicionado +1 fruta nova na lista
     assert len(fruit_list) == 2
+
+#Teste (Red)
+def test_manage_fruits_does_not_make_fruits_when_position_is_invalid():
+    player = Snake(start_x=0, start_y=0) 
+    player.body = [(0,0),(0,1),(1,1)] 
+    
+    fruit_list = []
+    
+    # Act
+    manage_fruits(player, fruit_list, max_x=2, max_y=2)
+    
+    # Assert
+    # Só pode adicionar a fruta em uma única posição válida
+    assert len(fruit_list) == 1
+    assert fruit_list[0] == (1, 0) # A única posição válida para a fruta é (1,0) porque as outras estão ocupadas pelo corpo da cobra
