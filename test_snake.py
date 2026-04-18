@@ -201,7 +201,7 @@ def test_process_turn_game_over_on_input():
 
     assert game_over == True
 
-#Teste (Red)
+#Teste (Green)
 def test_process_turn_growth():
     player = Snake(start_x=5, start_y=5)
     instance = io_handler((10, 10), 0.5)
