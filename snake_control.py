@@ -24,6 +24,6 @@ class Snake:
 
         head_x, head_y = self.body[0]
         d_x, d_y = self.directions[self.direction]
-        new_head = (head_x + d_x, head_y + d_y)
+        new_head = ((head_x + d_x) % max_x, (head_y + d_y) % max_y)
         self.body.insert(0, new_head)
         self.body.pop()
