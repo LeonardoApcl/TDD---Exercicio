@@ -245,3 +245,20 @@ def test_manage_fruits_does_not_make_fruits_when_position_is_invalid():
     # Só pode adicionar a fruta em uma única posição válida
     assert len(fruit_list) == 1
     assert fruit_list[0] == (1, 0) # A única posição válida para a fruta é (1,0) porque as outras estão ocupadas pelo corpo da cobra
+
+def test_manage_fruits_does_not_add_duplicate_fruits():
+    player = Snake(start_x=0, start_y=0) 
+    player.body = [
+    (0, 0), (1, 0), (2, 0), (3, 0), (4, 0), 
+    (5, 0), (6, 0), (7, 0), (8, 0), (9, 0)
+    ] 
+    
+    fruit_list = []
+    
+    # Act
+    manage_fruits(player, fruit_list, max_x=11, max_y=1)
+    
+    # Assert
+    # A função deve tentar adicionar uma fruta nova, mas como a única posição válida já tem uma fruta, ela não deve adicionar nada
+    assert len(fruit_list) == 1
+    assert fruit_list[0] == (10, 0) # A fruta existente deve permanecer inalterada
