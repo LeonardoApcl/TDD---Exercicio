@@ -177,7 +177,7 @@ def test_process_turn_erases_old_tail():
     assert instance.matrix[5][5] == 1 # A Cabeça antiga (5,5) agora é o corpo
     assert instance.matrix[5][4] == 0 # O rastro antigo (5,4) deve ser limpo (0)
 
-#Teste(Red)
+#Teste(Green)
 def test_process_turn_game_over_on_self_collision():
     player = Snake(start_x=5, start_y=5)
     instance = io_handler((10, 10), 0.5)

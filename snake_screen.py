@@ -76,6 +76,8 @@ def process_turn(snake, display_handler, fruit_pos):
         else:
             display_handler.matrix[p_y][p_x] = 1 # Corpo
 
+    if snake.check_collision():
+        return True
     return False
 
 def game_loop():
