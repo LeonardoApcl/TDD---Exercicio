@@ -144,7 +144,7 @@ def test_allowed_fruits_rule():
 
 ###########  Testes para o loop geral de gameplay e integração da tela com a lógica da cobra ###########
 
-#Teste (Red) - não há implementação do process_turn, apenas um placeholder que retorna True
+#Teste (Green) - não há implementação do process_turn, apenas um placeholder que retorna True
 def test_process_turn_updates_matrix():
     #arrange
 
@@ -159,3 +159,20 @@ def test_process_turn_updates_matrix():
     assert instance.matrix[5][6] == 2   # A matriz da tela recebeu a cabeça (2) na nova posição
     assert instance.matrix[5][5] == 1   # A matriz da tela recebeu o corpo (1)
     assert instance.matrix[0][0] == 3   # A matriz da tela recebeu a fruta (3) na posição correta
+
+#Teste (Red)
+def test_process_turn_erases_old_tail():
+    # Arrange
+    player = Snake(start_x=5, start_y=5) 
+    instance = io_handler((10, 10), 0.5)
+    
+    
+    # Isso simula o rastro do frame anterior, onde a cabeça estava em (5,5) e o corpo em (5,4)
+    instance.matrix[5][4] = 1 
+    
+    process_turn(player, instance, fruit_pos=(0, 0))
+    
+    # Assert
+    assert instance.matrix[4][5] == 2 # A Cabeça deve estar na nova posição (4,5), o input padrão do io_handler é 'w' ao invés do 'd' usado no snake_control
+    assert instance.matrix[5][5] == 1 # A Cabeça antiga (5,5) agora é o corpo
+    assert instance.matrix[5][4] == 0 # O rastro antigo (5,4) deve ser limpo (0)
