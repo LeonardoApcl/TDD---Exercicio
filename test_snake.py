@@ -158,3 +158,4 @@ def test_process_turn_updates_matrix():
     assert player.body[0] == (6, 5) # A cabeça andou pra direita
     assert instance.matrix[5][6] == 2   # A matriz da tela recebeu a cabeça (2) na nova posição
     assert instance.matrix[5][5] == 1   # A matriz da tela recebeu o corpo (1)
+    assert instance.matrix[0][0] == 3   # A matriz da tela recebeu a fruta (3) na posição correta
