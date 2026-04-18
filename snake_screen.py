@@ -108,13 +108,19 @@ def manage_fruits(snake, fruit_list, max_x, max_y):
 def game_loop():
     instance = io_handler((10,10), 0.5)
     instance.record_inputs()
-
     player = Snake(start_x=5, start_y=5)
+    
+    fruit_list = []
+
     while True:
-        
-        game_over = process_turn(player, instance)
+        manage_fruits(player, fruit_list, instance.x_size, instance.y_size)
+
+        game_over = process_turn(player, instance, fruit_list)
         if game_over:
             print("Você perdeu!")
             break
         instance.display()
+        print("mova com WASD, saia com esc. Ultimo botão:", instance.last_input)
         time.sleep(instance.game_speed)
+
+game_loop()
