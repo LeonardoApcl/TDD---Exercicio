@@ -189,3 +189,14 @@ def test_process_turn_game_over_on_self_collision():
     game_over = process_turn(player, instance, fruit_pos=(0, 0))
 
     assert game_over == True
+
+#Teste (Red)
+def test_process_turn_game_over_on_input():
+    player = Snake(start_x=5, start_y=5)
+    instance = io_handler((10, 10), 0.5)
+    
+    instance.last_input = 'end' # input de saída do jogo, que deve causar game over imediato
+
+    game_over = process_turn(player, instance, fruit_pos=(0, 0))
+
+    assert game_over == True
