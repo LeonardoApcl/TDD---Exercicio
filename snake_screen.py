@@ -88,6 +88,12 @@ def process_turn(snake, display_handler, fruit_list):
         return True
     return False
 
+def manage_fruits(snake, fruit_list, max_x, max_y):
+    n = snake.get_allowed_fruits() - len(fruit_list) # Quantas frutas faltam para atingir o limite permitido
+    for _ in range(n):
+        new_fruit = (1, 1)
+        fruit_list.append(new_fruit)
+
 def game_loop():
     instance = io_handler((10,10), 0.5)
     instance.record_inputs()
