@@ -19,7 +19,7 @@ class Snake:
 
     def move(self, user_input, max_x, max_y):
 
-        if user_input != self.opposites.get(self.direction):
+        if user_input in self.directions and user_input != self.opposites.get(self.direction):
             self.direction = user_input
 
         head_x, head_y = self.body[0]

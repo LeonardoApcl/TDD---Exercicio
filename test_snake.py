@@ -92,7 +92,7 @@ def test_snake_move_out_of_bounds_vertical():
     assert len(player.body) == 2         # O tamanho continua sendo 2
     assert player.body[-1] == (5, 0)     # A antiga cabeça (5,0) agora é o corpo
 
-#Teste (Red) - Testa comportamento de movimento com input inválido
+#Teste (Green) - Testa comportamento de movimento com input inválido
 def test_snake_input_validation():
     player = Snake(start_x=5, start_y=5)
 
