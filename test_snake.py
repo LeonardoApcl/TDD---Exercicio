@@ -100,3 +100,13 @@ def test_snake_input_validation():
 
     assert player.direction == 'd' # Deve ignorar o input inválido e continuar na direção atual
     assert player.body[0] == (6, 5) # Deve ter andado para a direita normalmente
+
+#Teste (Red) - Teste para crescimento da cobra (ainda não implementado)
+def test_snake_growth():
+    player = Snake(start_x=5, start_y=5)
+
+    player.grow() # Método de crescimento ainda não implementado
+    player.move('d', max_x=10, max_y=10) # Move para a direita após crescer
+
+    assert len(player.body) == 3 # Espera que o corpo cresça para 3 segmentos
+    assert player.body == [(6, 5), (5, 5), (4, 5)] # Espera que o novo segmento seja adicionado na posição do antigo rabo (4,5)
