@@ -1,7 +1,8 @@
 class Snake:
     def __init__(self, start_x, start_y):
-        self.body = [(start_x, start_y), (start_x, start_y - 1)]
+        self.body = [(start_x, start_y), (start_x - 1, start_y)]
         self.direction = 'd'
+        self.grow_pending = False
 
         self.directions = {
             'w': (0, -1),
@@ -26,4 +27,12 @@ class Snake:
         d_x, d_y = self.directions[self.direction]
         new_head = ((head_x + d_x) % max_x, (head_y + d_y) % max_y)
         self.body.insert(0, new_head)
-        self.body.pop()
+
+        #corta o rabo da cobra, a menos que ela tenha acabado de comer (crescer)
+        if self.grow_pending:
+            self.grow_pending = False # Reseta a flag, a cobra acabou de crescer
+        else:
+            self.body.pop()
+
+    def grow(self):
+        self.grow_pending = True
