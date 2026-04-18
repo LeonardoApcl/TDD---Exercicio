@@ -2,6 +2,8 @@ import os
 import keyboard
 import time
 
+from snake_control import Snake
+
 
 class io_handler:
     
@@ -55,21 +57,26 @@ class io_handler:
         display_h_line(self)
 
 ### exemplo do uso da classe io_handler  
-instance = io_handler((10,15), 0.5)
-instance.matrix[0][0] = 1 #corpo
-instance.matrix[0][1] = 2 #cabeça
-instance.matrix[0][2] = 3 #fruta
+#instance = io_handler((10,15), 0.5)
+#instance.matrix[0][0] = 1 #corpo
+#instance.matrix[0][1] = 2 #cabeça
+#instance.matrix[0][2] = 3 #fruta
+
+def process_turn(snake, display_handler):
+    return True
 
 def game_loop():
+    instance = io_handler((10,10), 0.5)
     instance.record_inputs()
-    while True:
-        instance.display()
-        print("mova com WASD, saia com esc. Ultimo botão:", end=' ')
-        ###adicione seu código para lidar com o jogo aqui
 
-        print(instance.last_input)
-        if(instance.last_input == 'end'):
-            exit()
+    player = Snake(start_x=5, start_y=5)
+    while True:
+        
+        game_over = process_turn(player, instance)
+        if game_over:
+            print("Você perdeu!")
+            break
+        instance.display()
         time.sleep(instance.game_speed)
 
 game_loop()

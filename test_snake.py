@@ -1,5 +1,6 @@
 import pytest
 from snake_control import Snake
+from snake_screen import game_loop
 
 #Teste (Green)
 def test_snake_initialization():
@@ -140,3 +141,6 @@ def test_allowed_fruits_rule():
     # Simulamos uma cobra com tamanho de 25 -> 3 frutas
     player.body = [(0,0)] * 25
     assert player.get_allowed_fruits() == 3
+
+######Testes para o loop geral de gameplay e integração da tela com a lógica da cobra
+
