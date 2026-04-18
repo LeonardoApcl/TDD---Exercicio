@@ -90,12 +90,18 @@ def process_turn(snake, display_handler, fruit_list):
     return False
 
 def manage_fruits(snake, fruit_list, max_x, max_y):
-    limit = snake.get_allowed_fruits() - len(fruit_list)
+    limit_T = snake.get_allowed_fruits() - len(fruit_list)
+
+    total_spaces = max_x * max_y
+    occupied_spaces = len(snake.body) + len(fruit_list)
+    free_spaces = total_spaces - occupied_spaces
+
+    limit = min(limit_T, free_spaces)
     
     # Enquanto faltar fruta na tela, gera novas!
     while limit > 0:
         new_fruit = (random.randint(0, max_x - 1), random.randint(0, max_y - 1))
-        if new_fruit not in snake.body:
+        if new_fruit not in snake.body and new_fruit not in fruit_list:
             fruit_list.append(new_fruit)
             limit -= 1
 
