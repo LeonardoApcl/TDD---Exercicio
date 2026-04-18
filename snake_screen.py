@@ -95,8 +95,9 @@ def manage_fruits(snake, fruit_list, max_x, max_y):
     # Enquanto faltar fruta na tela, gera novas!
     while limit > 0:
         new_fruit = (random.randint(0, max_x - 1), random.randint(0, max_y - 1))
-        fruit_list.append(new_fruit)
-        limit -= 1
+        if new_fruit not in snake.body:
+            fruit_list.append(new_fruit)
+            limit -= 1
 
 def game_loop():
     instance = io_handler((10,10), 0.5)
