@@ -1,6 +1,6 @@
 import pytest
 from snake_control import Snake
-from snake_screen import game_loop
+from snake_screen import io_handler, process_turn
 
 #Teste (Green)
 def test_snake_initialization():
@@ -142,5 +142,19 @@ def test_allowed_fruits_rule():
     player.body = [(0,0)] * 25
     assert player.get_allowed_fruits() == 3
 
-######Testes para o loop geral de gameplay e integração da tela com a lógica da cobra
+###########  Testes para o loop geral de gameplay e integração da tela com a lógica da cobra ###########
 
+#Teste (Red) - não há implementação do process_turn, apenas um placeholder que retorna True
+def test_process_turn_updates_matrix():
+    #arrange
+
+    player = Snake(start_x=5, start_y=5)
+    instance = io_handler((10, 10), 0.5)
+    instance.last_input = 'd' # Simula o usuário apertando 'd'
+
+    game_over = process_turn(player, instance, fruit_pos=(0, 0))
+
+    assert game_over == False
+    assert player.body[0] == (6, 5) # A cabeça andou pra direita
+    assert instance.matrix[5][6] == 2   # A matriz da tela recebeu a cabeça (2) na nova posição
+    assert instance.matrix[5][5] == 1   # A matriz da tela recebeu o corpo (1)
