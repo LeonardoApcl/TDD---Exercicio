@@ -42,11 +42,4 @@ class Snake:
         return head in self.body[1:]
     
     def get_allowed_fruits(self):
-        size = len(self.body)
-
-        if size < 10:
-            return 1
-        elif size < 20:
-            return 2
-        else:
-            return 3
+        return (len(self.body) // 10) + 1 
