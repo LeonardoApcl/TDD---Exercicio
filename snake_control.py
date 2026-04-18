@@ -36,3 +36,7 @@ class Snake:
 
     def grow(self):
         self.grow_pending = True
+
+    def check_collision(self):
+        head = self.body[0]
+        return head in self.body[1:]

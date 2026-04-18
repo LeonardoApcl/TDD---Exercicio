@@ -111,13 +111,13 @@ def test_snake_growth():
     assert len(player.body) == 3 # Espera que o corpo cresça para 3 segmentos
     assert player.body == [(6, 5), (5, 5), (4, 5)] # Espera que o novo segmento seja adicionado na posição do antigo rabo (4,5)
 
-#Teste (Red) - Testa colisão da cobra consigo mesma
+#Teste (Green) - Testa colisão da cobra consigo mesma
 def test_snake_no_collision_start():
     player = Snake(start_x=5, start_y=5)
     # Uma cobra nova nunca deve estar em colisão
     assert player.check_collision() == False
 
-#Teste (Red) - Testa colisão da cobra consigo mesma
+#Teste (Green) - Testa colisão da cobra consigo mesma
 def test_snake_self_collision():
     player = Snake(start_x=5, start_y=5)
     # Simulamos uma cobra grande enrolada em si mesma 
