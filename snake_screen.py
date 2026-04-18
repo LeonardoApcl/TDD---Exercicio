@@ -63,6 +63,10 @@ class io_handler:
 #instance.matrix[0][2] = 3 #fruta
 
 def process_turn(snake, display_handler, fruit_pos):
+
+    if display_handler.last_input == 'end':
+        return True
+    
     snake.move(display_handler.last_input, display_handler.x_size, display_handler.y_size)
     display_handler.matrix = [[0] * display_handler.x_size for _ in range(display_handler.y_size)]
 
