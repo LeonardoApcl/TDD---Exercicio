@@ -62,18 +62,20 @@ class io_handler:
 #instance.matrix[0][1] = 2 #cabeça
 #instance.matrix[0][2] = 3 #fruta
 
-def process_turn(snake, display_handler, fruit_pos):
+def process_turn(snake, display_handler, fruit_list):
     if display_handler.last_input == 'end':
         return True
 
     snake.move(display_handler.last_input, display_handler.x_size, display_handler.y_size)
     display_handler.matrix = [[0] * display_handler.x_size for _ in range(display_handler.y_size)]
 
-    if snake.body[0] == fruit_pos: # Se a cabeça da cobra está na posição da fruta, ela deve crescer
+    if snake.body[0] in fruit_list:
         snake.grow()
+        fruit_list.remove(snake.body[0]) # Remove a fruta específica que foi comida
 
-    fruit_x, fruit_y = fruit_pos
-    display_handler.matrix[fruit_y][fruit_x] = 3 # Marca a fruta na posição correta
+    for f_x, f_y in fruit_list:
+        if f_x >= 0 and f_y >= 0: # Checagem de segurança
+            display_handler.matrix[f_y][f_x] = 3 # Marca as frutas na matriz
 
     for index, part in enumerate(snake.body):
         p_x, p_y = part

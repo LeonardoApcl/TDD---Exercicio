@@ -152,7 +152,7 @@ def test_process_turn_updates_matrix():
     instance = io_handler((10, 10), 0.5)
     instance.last_input = 'd' # Simula o usuário apertando 'd'
 
-    game_over = process_turn(player, instance, fruit_pos=(0, 0))
+    game_over = process_turn(player, instance, fruit_list=[(0, 0)])
 
     assert game_over == False
     assert player.body[0] == (6, 5) # A cabeça andou pra direita
@@ -170,7 +170,7 @@ def test_process_turn_erases_old_tail():
     # Isso simula o rastro do frame anterior, onde a cabeça estava em (5,5) e o corpo em (5,4)
     instance.matrix[5][4] = 1 
     
-    process_turn(player, instance, fruit_pos=(0, 0))
+    process_turn(player, instance, fruit_list=[(0, 0)])
     
     # Assert
     assert instance.matrix[4][5] == 2 # A Cabeça deve estar na nova posição (4,5), o input padrão do io_handler é 'w' ao invés do 'd' usado no snake_control
@@ -186,7 +186,7 @@ def test_process_turn_game_over_on_self_collision():
     player.body = [(5, 5), (5, 6), (6, 6), (6, 5), (6,4)] 
     instance.last_input = 's' # Tenta mover para baixo, o que causaria colisão com o corpo
 
-    game_over = process_turn(player, instance, fruit_pos=(0, 0))
+    game_over = process_turn(player, instance,  fruit_list=[(0, 0)])
 
     assert game_over == True
 
@@ -197,7 +197,7 @@ def test_process_turn_game_over_on_input():
     
     instance.last_input = 'end' # input de saída do jogo, que deve causar game over imediato
 
-    game_over = process_turn(player, instance, fruit_pos=(0, 0))
+    game_over = process_turn(player, instance, fruit_list=[(0, 0)])
 
     assert game_over == True
 
@@ -208,6 +208,6 @@ def test_process_turn_growth():
     
     instance.last_input = 'd' # Move para a direita
 
-    game_over = process_turn(player, instance, fruit_pos=(6, 5)) # A fruta está na posição para onde a cabeça vai se mover
+    game_over = process_turn(player, instance, fruit_list=[(6, 5)]) # A fruta está na posição para onde a cabeça vai se mover
 
     assert player.grow_pending == True # A cobra deve ter a flag de crescimento ativada
