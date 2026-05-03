@@ -50,19 +50,19 @@ class PygameHandler:
         # Limpa a tela
         screen.fill((0, 0, 0)) 
         
-        # Desenha todas as frutas
         for f_x, f_y in fruit_list:
             coordenada = (f_x * self.block_size, f_y * self.block_size)
-            screen.blit(self.img_fruit, coordenada)
+            screen.blit(self.sprites['apple'], coordenada)
             
-        # Desenha a cobra a partir da lista do corpo
+        # Desenha a Cobra Dinamicamente
         for index, (p_x, p_y) in enumerate(snake_body):
             coordenada = (p_x * self.block_size, p_y * self.block_size)
             
-            if index == 0:
-                screen.blit(self.img_head, coordenada) # Cabeça
-            else:
-                screen.blit(self.img_body, coordenada) # Corpo
+            # Pergunta ao Cérebro Visual qual é o nome correto da imagem
+            nome_correto = get_sprite_name(snake_body, index)
+            
+            # Vai no dicionário buscar o sprite exato e desenha na tela
+            screen.blit(self.sprites[nome_correto], coordenada)
                 
         # Atualiza a tela
         if not isinstance(screen, type(pygame.Surface((1,1)))): 
