@@ -305,3 +305,30 @@ def test_sprite_cabeca(corpo, sprite_esperado):
     
     # Assert
     assert resultado == sprite_esperado
+
+@pytest.mark.parametrize("corpo, index_alvo, sprite_esperado", [
+    # --- Linhas Retas ---
+    ([(5, 3), (5, 4), (5, 5)], 1, "body_vertical"),   # X é todo igual, variação no Y
+    ([(4, 5), (5, 5), (6, 5)], 1, "body_horizontal"), # Y é todo igual, variação no X
+    
+    # --- Curvas (O vértice está sempre no index 1) ---
+    # Nome baseado no nome das imagens
+    
+    # Esquerda <-> Cima
+    ([(4, 5), (5, 5), (5, 4)], 1, "body_bottomleft"), 
+    
+    # Direita <-> Cima
+    ([(6, 5), (5, 5), (5, 4)], 1, "body_bottomright"),
+    
+    # Esquerda <-> Baixo
+    ([(4, 5), (5, 5), (5, 6)], 1, "body_topleft"),
+    
+    # Direita <-> Baixo
+    ([(6, 5), (5, 5), (5, 6)], 1, "body_topright"),
+])
+def test_sprite_corpo_curvas(corpo, index_alvo, sprite_esperado):
+    # Act
+    resultado = get_sprite_name(corpo, index=index_alvo)
+    
+    # Assert
+    assert resultado == sprite_esperado
