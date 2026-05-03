@@ -359,3 +359,42 @@ def test_pygame_handler_loads_all_sprites():
     
     for nome in esperados:
         assert nome in handler.sprites # O dicionário deve conter todas estas chaves!
+
+@pytest.mark.parametrize("corpo_cobra, sprites_esperados", [
+    # Cenário 1: Cobra Reta Horizontal (indo para a direita)
+    (
+        [(5, 5), (4, 5), (3, 5)], 
+        [('head_right', 100, 100), ('body_horizontal', 80, 100), ('tail_right', 60, 100)]
+    ),
+    # Cenário 2: Cobra Reta Vertical (indo para baixo)
+    (
+        [(5, 5), (5, 4), (5, 3)], 
+        [('head_down', 100, 100), ('body_vertical', 100, 80), ('tail_down', 100, 60)]
+    ),
+    # Cenário 3: Cobra fazendo uma Curva (Tamanho 3)
+    (
+        [(5, 4), (5, 5), (6, 5)], 
+        [('head_up', 100, 80), ('body_topright', 100, 100), ('tail_right', 120, 100)]
+    )
+])
+def test_pygame_display_uses_dynamic_sprites(corpo_cobra, sprites_esperados):
+    # Arrange
+    handler = PygameHandler(x_size=10, y_size=10, block_size=20)
+    
+    # Usa o mock do dicionário de sprites para saber se o display chamou a chave certa
+    for key in handler.sprites.keys():
+        handler.sprites[key] = MagicMock(name=key)
+        
+    tela_falsa = MagicMock()
+    lista_frutas = [(1, 1)] # Fruta fixa em x=20, y=20
+    
+    # Act
+    handler.display(tela_falsa, corpo_cobra, lista_frutas)
+    
+    # Assert
+    # Verifica se a maçã foi desenhada
+    tela_falsa.blit.assert_any_call(handler.sprites['apple'], (20, 20))
+    
+    # Verifica dinamicamente se a cobra foi desenhada com os sprites e posições exatas
+    for nome_sprite, pos_x, pos_y in sprites_esperados:
+        tela_falsa.blit.assert_any_call(handler.sprites[nome_sprite], (pos_x, pos_y))
