@@ -73,6 +73,16 @@ def get_sprite_name(corpo, index):
         if head_x > neck_x: return "head_right"
         if head_x < neck_x: return "head_left"
 
+    elif index == len(corpo) - 1:
+        tail_x, tail_y = corpo[index]
+        front_x, front_y = corpo[index - 1] # A parte do corpo que está ligada à cauda
+
+        # Compara a ponta da cauda com o bloco da frente
+        if tail_y < front_y: return "tail_up"
+        if tail_y > front_y: return "tail_down"
+        if tail_x > front_x: return "tail_right"
+        if tail_x < front_x: return "tail_left"
+
     else:
         # Pega a coordenada atual e as coordenadas dos dois vizinhos (anterior e próximo)
         x, y = corpo[index]
