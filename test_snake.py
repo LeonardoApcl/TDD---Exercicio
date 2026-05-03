@@ -330,3 +330,17 @@ def test_sprite_corpo_curvas(corpo, index_alvo, sprite_esperado):
     
     # Assert
     assert resultado == sprite_esperado
+
+@pytest.mark.parametrize("corpo, sprite_esperado", [
+    ([(5, 2), (5, 3), (5, 4)], "tail_down"),  # Cauda em y=4, corpo da frente em y=3 (Ponta virada para baixo)
+    ([(5, 6), (5, 5), (5, 4)], "tail_up"),    # Cauda em y=4, corpo da frente em y=5 (Ponta virada para cima)
+    ([(3, 5), (4, 5), (5, 5)], "tail_right"), # Cauda em x=5, corpo da frente em x=4 (Ponta virada para a direita)
+    ([(7, 5), (6, 5), (5, 5)], "tail_left"),  # Cauda em x=5, corpo da frente em x=6 (Ponta virada para a esquerda)
+])
+def test_sprite_cauda(corpo, sprite_esperado):
+    # Act
+    ultimo_index = len(corpo) - 1
+    resultado = get_sprite_name(corpo, index=ultimo_index)
+    
+    # Assert
+    assert resultado == sprite_esperado
