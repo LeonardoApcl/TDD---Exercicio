@@ -1,6 +1,9 @@
 import pytest
 from snake_model import Snake
 from snake_control import process_turn, manage_fruits
+import pygame
+from snake_screen import PygameHandler
+from unittest.mock import Mock, MagicMock, patch
 
 def test_snake_initialization():
     # Arrange & Act
@@ -223,9 +226,6 @@ def test_manage_fruits_does_not_add_duplicate_fruits():
     assert fruit_list[0] == (10, 0) # A fruta existente deve permanecer inalterada
 
 #------------------------------ Testes Com o Pygame ------------------------------
-import pygame
-from snake_screen import PygameHandler
-from unittest.mock import Mock, MagicMock
 
 @pytest.mark.parametrize("pygame_key, expected_direction", [
     (pygame.K_UP, 'w'),
@@ -398,3 +398,28 @@ def test_pygame_display_uses_dynamic_sprites(corpo_cobra, sprites_esperados):
     # Verifica dinamicamente se a cobra foi desenhada com os sprites e posições exatas
     for nome_sprite, pos_x, pos_y in sprites_esperados:
         tela_falsa.blit.assert_any_call(handler.sprites[nome_sprite], (pos_x, pos_y))
+
+# Espiona as funções do Pygame para não ter que carregar imagens reais do disco no teste
+@patch('pygame.transform.scale')
+@patch('pygame.image.load')
+def test_pygame_handler_loads_images_into_dictionary(mock_load, mock_scale):
+    # Arrange
+    from snake_screen import PygameHandler # Ajuste o import
+    
+    # Configur os espiões para devolverem algo sempre que forem chamados
+    mock_load.return_value = pygame.Surface((10, 10)) 
+    mock_scale.return_value = "Imagem_Escalonada_Mock" 
+    
+    # Act
+    handler = PygameHandler(x_size=10, y_size=10, block_size=20)
+    
+    # Assert
+    # Verifica se a função de carregar imagem foi chamada exatamente 15 vezes!
+    assert mock_load.call_count == 15
+    
+    # Garante que TODOS os valores no dicionário foram preenchidos (Nenhum é None)
+    assert None not in handler.sprites.values()
+    
+    # Garante que os valores receberam a imagem processada
+    assert handler.sprites['head_up'] == "Imagem_Escalonada_Mock"
+    assert handler.sprites['apple'] == "Imagem_Escalonada_Mock"
