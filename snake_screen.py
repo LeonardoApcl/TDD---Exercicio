@@ -61,3 +61,14 @@ class PygameHandler:
             pass
         else:
             pygame.display.flip()
+
+def get_sprite_name(corpo, index):
+    if index == 0:
+        head_x, head_y = corpo[0]
+        neck_x, neck_y = corpo[1]
+
+        # Compara a cabeça com o pescoço
+        if head_y < neck_y: return "head_up"
+        if head_y > neck_y: return "head_down"
+        if head_x > neck_x: return "head_right"
+        if head_x < neck_x: return "head_left"
