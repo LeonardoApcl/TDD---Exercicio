@@ -72,3 +72,29 @@ def get_sprite_name(corpo, index):
         if head_y > neck_y: return "head_down"
         if head_x > neck_x: return "head_right"
         if head_x < neck_x: return "head_left"
+
+    else:
+        # Pega a coordenada atual e as coordenadas dos dois vizinhos (anterior e próximo)
+        x, y = corpo[index]
+        prev_x, prev_y = corpo[index - 1]
+        next_x, next_y = corpo[index + 1]
+
+        # Se o X de ambos os vizinhos for igual, é uma linha reta vertical
+        if prev_x == next_x: return "body_vertical"
+        
+        # Se o Y de ambos os vizinhos for igual, é uma linha reta horizontal
+        if prev_y == next_y: return "body_horizontal"
+
+        # Se não é reta, é curva! Vamos verificar em quais posições os vizinhos estão:
+        vizinhos_x = (prev_x, next_x)
+        vizinhos_y = (prev_y, next_y)
+
+        is_left = (x - 1) in vizinhos_x
+        is_right = (x + 1) in vizinhos_x
+        is_up = (y - 1) in vizinhos_y
+        is_down = (y + 1) in vizinhos_y
+
+        if is_up and is_left: return "body_bottomleft"
+        if is_up and is_right: return "body_bottomright"
+        if is_down and is_left: return "body_topleft"
+        if is_down and is_right: return "body_topright"
