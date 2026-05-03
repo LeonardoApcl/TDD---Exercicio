@@ -16,6 +16,14 @@ class PygameHandler:
             pygame.K_ESCAPE: 'end'
         }
 
+        self.sprites = {
+            'head_up': None, 'head_down': None, 'head_left': None, 'head_right': None,
+            'tail_up': None, 'tail_down': None, 'tail_left': None, 'tail_right': None,
+            'body_vertical': None, 'body_horizontal': None,
+            'body_topleft': None, 'body_topright': None, 'body_bottomleft': None, 'body_bottomright': None,
+            'apple': None
+        }
+
         # Coloquei um try/except para evitar que o Pytest quebre se não achar a imagem na pasta dele.
         try:
             self.img_head = pygame.image.load('Graphics/head_right.png')
