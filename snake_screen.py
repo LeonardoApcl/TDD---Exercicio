@@ -16,55 +16,51 @@ class PygameHandler:
             pygame.K_ESCAPE: 'end'
         }
 
-        self.sprites = {
-            'head_up': None, 'head_down': None, 'head_left': None, 'head_right': None,
-            'tail_up': None, 'tail_down': None, 'tail_left': None, 'tail_right': None,
-            'body_vertical': None, 'body_horizontal': None,
-            'body_topleft': None, 'body_topright': None, 'body_bottomleft': None, 'body_bottomright': None,
-            'apple': None
-        }
-
-        # Coloquei um try/except para evitar que o Pytest quebre se não achar a imagem na pasta dele.
-        try:
-            self.img_head = pygame.image.load('Graphics/head_right.png')
-            self.img_body = pygame.image.load('Graphics/tail_left.png')
-            self.img_fruit = pygame.image.load('Graphics/apple.png')
-            
-            # Redimensiona as imagens para caberem perfeitamente nos "quadradinhos" do jogo
-            self.img_head = pygame.transform.scale(self.img_head, (block_size, block_size))
-            self.img_body = pygame.transform.scale(self.img_body, (block_size, block_size))
-            self.img_fruit = pygame.transform.scale(self.img_fruit, (block_size, block_size))
-        except FileNotFoundError:
-            # Fallback de segurança exclusivo para os testes
-            self.img_head = pygame.Surface((block_size, block_size))
-            self.img_body = pygame.Surface((block_size, block_size))
-            self.img_fruit = pygame.Surface((block_size, block_size))
+        # O NOVO SISTEMA DE SPRITES
+        self.sprites = {}
+        nomes_sprites = [
+            'head_up', 'head_down', 'head_left', 'head_right',
+            'tail_up', 'tail_down', 'tail_left', 'tail_right',
+            'body_vertical', 'body_horizontal',
+            'body_topleft', 'body_topright', 'body_bottomleft', 'body_bottomright',
+            'apple'
+        ]
+        
+        # Carrega todos os sprites automaticamente usando um loop
+        for nome in nomes_sprites:
+            try:
+                # O caminho deve bater com a pasta onde guardou as imagens do asset pack
+                img = pygame.image.load(f'Graphics/{nome}.png') 
+                self.sprites[nome] = pygame.transform.scale(img, (block_size, block_size))
+            except FileNotFoundError:
+                # Fallback de segurança para o Pytest
+                self.sprites[nome] = pygame.Surface((block_size, block_size))
 
     def parse_event(self, event):
-        # Se for um evento de apertar tecla e estiver no nosso mapa, atualiza
         if event.type == pygame.KEYDOWN:
             if event.key in self.key_map:
                 self.last_input = self.key_map[event.key]
 
     def display(self, screen, snake_body, fruit_list):
-        # Limpa a tela
         screen.fill((0, 0, 0)) 
         
+        # Desenha as Frutas
         for f_x, f_y in fruit_list:
             coordenada = (f_x * self.block_size, f_y * self.block_size)
             screen.blit(self.sprites['apple'], coordenada)
             
-        # Desenha a Cobra Dinamicamente
+        # Desenha a Cobra Dinamicamente!
         for index, (p_x, p_y) in enumerate(snake_body):
             coordenada = (p_x * self.block_size, p_y * self.block_size)
-            
-            # Pergunta ao Cérebro Visual qual é o nome correto da imagem
             nome_correto = get_sprite_name(snake_body, index)
             
-            # Vai no dicionário buscar o sprite exato e desenha na tela
+            # Um pequeno fallback de segurança (se a função não souber o que é, desenha horizontal)
+            if not nome_correto or nome_correto not in self.sprites:
+                nome_correto = 'body_horizontal' 
+                
+            # Desenha a imagem selecionada
             screen.blit(self.sprites[nome_correto], coordenada)
                 
-        # Atualiza a tela
         if not isinstance(screen, type(pygame.Surface((1,1)))): 
             pass
         else:
