@@ -1,45 +1,73 @@
-class Snake:
-    def __init__(self, start_x, start_y):
-        self.body = [(start_x, start_y), (start_x - 1, start_y)]
-        self.direction = 'd'
-        self.grow_pending = False
+import random
+import pygame
+from snake_screen import PygameHandler
 
-        self.directions = {
-            'w': (0, -1),
-            's': (0, 1),
-            'a': (-1, 0),
-            'd': (1, 0)
-        }
+from snake_model import Snake
 
-        self.opposites = {
-            'w': 's',
-            's': 'w',
-            'a': 'd',
-            'd': 'a'
-        }
+def process_turn(snake, fruit_list, max_x, max_y, last_input):
+    # Checa se o jogador pediu para sair
+    if last_input == 'end':
+        return True
 
-    def move(self, user_input, max_x, max_y):
+    # Move a cobra
+    snake.move(last_input, max_x, max_y)
 
-        if user_input in self.directions and user_input != self.opposites.get(self.direction):
-            self.direction = user_input
+    # Lógica de comer a fruta
+    if snake.body[0] in fruit_list:
+        snake.grow()
+        fruit_list.remove(snake.body[0])
 
-        head_x, head_y = self.body[0]
-        d_x, d_y = self.directions[self.direction]
-        new_head = ((head_x + d_x) % max_x, (head_y + d_y) % max_y)
-        self.body.insert(0, new_head)
+    # Checa colisão (Game Over)
+    if snake.check_collision():
+        return True
+        
+    return False # O jogo continua
 
-        #corta o rabo da cobra, a menos que ela tenha acabado de comer (crescer)
-        if self.grow_pending:
-            self.grow_pending = False # Reseta a flag, a cobra acabou de crescer
-        else:
-            self.body.pop()
+def manage_fruits(snake, fruit_list, max_x, max_y):
+    limit_T = snake.get_allowed_fruits() - len(fruit_list)
 
-    def grow(self):
-        self.grow_pending = True
+    total_spaces = max_x * max_y
+    occupied_spaces = len(snake.body) + len(fruit_list)
+    free_spaces = total_spaces - occupied_spaces
 
-    def check_collision(self):
-        head = self.body[0]
-        return head in self.body[1:]
+    limit = min(limit_T, free_spaces)
     
-    def get_allowed_fruits(self):
-        return (len(self.body) // 10) + 1 
+    # Enquanto faltar fruta na tela, gera novas!
+    while limit > 0:
+        new_fruit = (random.randint(0, max_x - 1), random.randint(0, max_y - 1))
+        if new_fruit not in snake.body and new_fruit not in fruit_list:
+            fruit_list.append(new_fruit)
+            limit -= 1
+
+def game_loop():
+    pygame.init()
+    
+    tamanho_bloco = 20
+    largura, altura = 10, 15
+    screen = pygame.display.set_mode((largura * tamanho_bloco, altura * tamanho_bloco))
+    
+    player = Snake(start_x=5, start_y=5)
+    tela_handler = PygameHandler(largura, altura, tamanho_bloco)
+    frutas_na_tela = []
+    
+    clock = pygame.time.Clock()
+
+    while True:
+        # Pega inputs
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                return
+            tela_handler.parse_event(event)
+            
+        # Roda as regras do jogo (sem passar a tela!)
+        manage_fruits(player, frutas_na_tela, largura, altura)
+        game_over = process_turn(player, frutas_na_tela, largura, altura, tela_handler.last_input)
+        
+        if game_over:
+            print("GAME OVER")
+            break
+            
+        # Manda a tela desenhar o estado atual
+        tela_handler.display(screen, player.body, frutas_na_tela)
+        
+        clock.tick(5)

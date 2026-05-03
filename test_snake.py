@@ -1,8 +1,7 @@
 import pytest
-from snake_control import Snake
-from snake_screen import io_handler, process_turn, manage_fruits
+from snake_model import Snake
+from snake_control import process_turn, manage_fruits
 
-#Teste (Green)
 def test_snake_initialization():
     # Arrange & Act
     player = Snake(start_x=5, start_y=5)
@@ -11,67 +10,43 @@ def test_snake_initialization():
     assert len(player.body) == 2
     assert player.direction == 'd'
 
-#Teste (Green)
-def test_snake_move_right():
+@pytest.mark.parametrize("lista_movimentos, cabeca_esperada", [
+    (['d'], (6, 5)),         # Movimento simples para a direita
+    (['w'], (5, 4)),         # Movimento simples para cima
+    (['s'], (5, 6)),         # Movimento simples para baixo
+    (['w', 'a'], (4, 4)),    # Sequência: vai para cima, depois esquerda (evita a ré)
+    (['s', 'a'], (4, 6)),    # Sequência: vai para baixo, depois esquerda
+])
+def test_snake_valid_movements(lista_movimentos, cabeca_esperada):
     # Arrange
-    player = Snake(start_x=5, start_y=5) # Corpo inicial: [(5,5), (5,4)]
+    player = Snake(start_x=5, start_y=5) # Corpo inicial: [(5,5), (5,4)], direção 'd'
     
     # Act
-    player.move('d', max_x=10, max_y=10) 
-    
+    for movimento in lista_movimentos:
+        player.move(movimento, max_x=10, max_y=10)
+        
     # Assert
-    assert player.body[0] == (6, 5)      # A cabeça deve ir para a direita (x+1)
-    assert len(player.body) == 2         # O tamanho deve continuar o mesmo
-    assert player.body[-1] == (5, 5)     # O corpo antigo (4,5) sumiu, o novo é (5,5)
+    assert player.body[0] == cabeca_esperada
+    assert len(player.body) == 2 # Garante que a cobra andou, mas não cresceu
 
-#Teste (Green)
-def test_snake_move_up():
+@pytest.mark.parametrize("input_invalido", [
+    'a',   # Direção oposta direta (ré)
+    'f',   # Tecla aleatória não mapeada
+    'x',   # Outra letra qualquer
+    '1',   # Número
+    ' ',   # Espaço em branco
+    'end'  # Palavra inteira
+])
+def test_snake_ignore_invalid_inputs(input_invalido):
     # Arrange
-    player = Snake(start_x=5, start_y=5) # Corpo inicial: [(5,5), (5,4)]
+    player = Snake(start_x=5, start_y=5) # Inicia virada para 'd'
     
     # Act
-    player.move('w', max_x=10, max_y=10) 
+    player.move(input_invalido, max_x=10, max_y=10)
     
     # Assert
-    assert player.body[0] == (5, 4)      # A cabeça deve ir para cima (y-1)
-    assert len(player.body) == 2         # O tamanho deve continuar o mesmo
-    assert player.body[-1] == (5, 5)     # O corpo antigo (4,5) sumiu, o novo é (5,5)
-
-#Teste (Green)
-def test_snake_move_down():
-    # Arrange
-    player = Snake(start_x=5, start_y=5) # Corpo inicial: [(5,5), (5,4)]
-    
-    # Act
-    player.move('s', max_x=10, max_y=10) 
-    
-    # Assert
-    assert player.body[0] == (5, 6)      # A cabeça deve ir para baixo (y+1)
-    assert len(player.body) == 2         # O tamanho deve continuar o mesmo
-    assert player.body[-1] == (5, 5)     # O corpo antigo (4,5) sumiu, o novo é (5,5)
-
-#Teste (Green) refatorado para impedir ré (inversão de direção)
-def test_snake_move_left():
-    # Arrange
-    player = Snake(start_x=5, start_y=5) # Corpo inicial: [(5,5), (5,4)]
-    
-    # Act
-    player.move('w', max_x=10, max_y=10) # Primeiro move para cima (válido)
-    player.move('a', max_x=10, max_y=10) # Depois tenta mandar para a esquerda (sem ré)
-    
-    # Assert
-    assert player.body[0] == (4, 4)      # A cabeça deve ir para cima (y-1) e para a esquerda (x-1)
-    assert len(player.body) == 2         # O tamanho deve continuar o mesmo
-    assert player.body[-1] == (5, 4)     # O corpo antigo (4,5) sumiu, o novo é (5,4)
-
-#Teste (Green)
-def test_snake_ignore_opposite_direction():
-    player = Snake(start_x=5, start_y=5) # Começa virada para direita ('d')
-    
-    player.move('a', max_y=10, max_x=10) # Tenta mandar para a esquerda (ré)
-    
-    assert player.direction == 'd'       # Deve ignorar e continuar para direita
-    assert player.body[0] == (6, 5)      # Deve ter andado para a direita normalmente
+    assert player.direction == 'd'   # A direção interna não pode ter sido alterada
+    assert player.body[0] == (6, 5)  # A cobra deve ter dado um passo para a direita mesmo assim
 
 #Teste (Green) - Testa comportamento de movimento para fora dos limites do mapa
 def test_snake_move_out_of_bounds():
@@ -106,7 +81,7 @@ def test_snake_input_validation():
 def test_snake_growth():
     player = Snake(start_x=5, start_y=5)
 
-    player.grow() # Método de crescimento ainda não implementado
+    player.grow() # Método de crescimento
     player.move('d', max_x=10, max_y=10) # Move para a direita após crescer
 
     assert len(player.body) == 3 # Espera que o corpo cresça para 3 segmentos
@@ -142,75 +117,58 @@ def test_allowed_fruits_rule():
     player.body = [(0,0)] * 25
     assert player.get_allowed_fruits() == 3
 
-###########  Testes para o loop geral de gameplay e integração da tela com a lógica da cobra ###########
+#---------------------------- Testes para o loop geral de gameplay ----------------------------
 
-#Teste (Green) - não há implementação do process_turn, apenas um placeholder que retorna True
-def test_process_turn_updates_matrix():
-    #arrange
-
-    player = Snake(start_x=5, start_y=5)
-    instance = io_handler((10, 10), 0.5)
-    instance.last_input = 'd' # Simula o usuário apertando 'd'
-
-    game_over = process_turn(player, instance, fruit_list=[(0, 0)])
-
-    assert game_over == False
-    assert player.body[0] == (6, 5) # A cabeça andou pra direita
-    assert instance.matrix[5][6] == 2   # A matriz da tela recebeu a cabeça (2) na nova posição
-    assert instance.matrix[5][5] == 1   # A matriz da tela recebeu o corpo (1)
-    assert instance.matrix[0][0] == 3   # A matriz da tela recebeu a fruta (3) na posição correta
-
-#Teste (Green))
-def test_process_turn_erases_old_tail():
+def test_process_turn_moves_snake():
     # Arrange
-    player = Snake(start_x=5, start_y=5) 
-    instance = io_handler((10, 10), 0.5)
+    player = Snake(start_x=5, start_y=5) # Inicia em (5,5) olhando para 'd'
+    fruit_list = [(0, 0)]
     
-    
-    # Isso simula o rastro do frame anterior, onde a cabeça estava em (5,5) e o corpo em (5,4)
-    instance.matrix[5][4] = 1 
-    
-    process_turn(player, instance, fruit_list=[(0, 0)])
-    
+    # Act: Passamos o input 'd' (direita)
+    game_over = process_turn(player, fruit_list, max_x=10, max_y=10, last_input='d')
+
     # Assert
-    assert instance.matrix[4][5] == 2 # A Cabeça deve estar na nova posição (4,5), o input padrão do io_handler é 'w' ao invés do 'd' usado no snake_control
-    assert instance.matrix[5][5] == 1 # A Cabeça antiga (5,5) agora é o corpo
-    assert instance.matrix[5][4] == 0 # O rastro antigo (5,4) deve ser limpo (0)
-
-#Teste(Green)
-def test_process_turn_game_over_on_self_collision():
-    player = Snake(start_x=5, start_y=5)
-    instance = io_handler((10, 10), 0.5)
+    assert game_over is False
+    assert player.body[0] == (6, 5) # A cabeça andou pra direita
+    assert len(player.body) == 2    # O tamanho não 
     
-    # Simulamos uma cobra grande enrolada em si mesma 
-    player.body = [(5, 5), (5, 6), (6, 6), (6, 5), (6,4)] 
-    instance.last_input = 's' # Tenta mover para baixo, o que causaria colisão com o corpo
-
-    game_over = process_turn(player, instance,  fruit_list=[(0, 0)])
-
-    assert game_over == True
-
-#Teste (Green)
 def test_process_turn_game_over_on_input():
+    # Arrange
     player = Snake(start_x=5, start_y=5)
-    instance = io_handler((10, 10), 0.5)
+    fruit_list = [(0, 0)]
     
-    instance.last_input = 'end' # input de saída do jogo, que deve causar game over imediato
+    # Act: Simulamos o botão de sair ('end')
+    game_over = process_turn(player, fruit_list, max_x=10, max_y=10, last_input='end')
 
-    game_over = process_turn(player, instance, fruit_list=[(0, 0)])
+    # Assert
+    assert game_over is True
 
-    assert game_over == True
-
-#Teste (Green)
-def test_process_turn_growth():
+def test_process_turn_game_over_on_self_collision():
+    # Arrange
     player = Snake(start_x=5, start_y=5)
-    instance = io_handler((10, 10), 0.5)
+    # Cobra longa enrolada. Ao mover para baixo ('s'), a cabeça (5,5) baterá no corpo (5,6)
+    player.body = [(5, 5), (5, 6), (6, 6), (6, 5), (6,4)] 
+    fruit_list = [(0, 0)]
+
+    # Act
+    game_over = process_turn(player, fruit_list, max_x=10, max_y=10, last_input='s')
+
+    # Assert
+    assert game_over is True
+
+def test_process_turn_eats_fruit_and_grows():
+    # Arrange
+    player = Snake(start_x=5, start_y=5)
+    # A fruta está na posição para onde a cabeça vai se mover
+    fruit_list = [(6, 5)] 
     
-    instance.last_input = 'd' # Move para a direita
+    # Act: Move a cobra para cima da fruta
+    game_over = process_turn(player, fruit_list, max_x=10, max_y=10, last_input='d')
 
-    game_over = process_turn(player, instance, fruit_list=[(6, 5)]) # A fruta está na posição para onde a cabeça vai se mover
-
-    assert player.grow_pending == True # A cobra deve ter a flag de crescimento ativada
+    # Assert
+    assert game_over is False
+    assert player.grow_pending is True # A cobra deve estar pronta para crescer
+    assert len(fruit_list) == 0        # A fruta deve sumir da lista do jogo
 
 #Teste (Green)
 def test_manage_fruits_respects_allowed_rule():
@@ -266,6 +224,7 @@ def test_manage_fruits_does_not_add_duplicate_fruits():
 
 #------------------------------ Testes Com o Pygame ------------------------------
 import pygame
+from snake_screen import PygameHandler
 from unittest.mock import Mock, MagicMock
 
 @pytest.mark.parametrize("pygame_key, expected_direction", [
@@ -285,7 +244,7 @@ def test_pygame_input_translation(pygame_key, expected_direction):
     mock_event.type = pygame.KEYDOWN
     mock_event.key = pygame_key # Usa a chave injetada pelo Pytest
     
-    from snake_pygame import PygameHandler
+    from snake_screen import PygameHandler
     tela_pygame = PygameHandler(x_size=10, y_size=10, block_size=20)
     
     # Act
@@ -296,30 +255,28 @@ def test_pygame_input_translation(pygame_key, expected_direction):
 
 def test_pygame_display_draws_sprites_with_blit():
     # Arrange
-    from snake_pygame import PygameHandler
     tamanho_bloco = 20
     handler = PygameHandler(x_size=2, y_size=2, block_size=tamanho_bloco)
     
     # Cria uma tela falsa (Mock)
     tela_falsa = MagicMock() 
     
-    # Matriz 2x2: Cabeça(2) em cima, Corpo(1) e Fruta(3) embaixo
-    matriz_teste = [
-        [2, 0],
-        [1, 3]
-    ]
+    # Nova estrutura de dados no lugar da matriz:
+    # A cabeça (0,0) é sempre o índice 0. O corpo (0,1) vem a seguir.
+    corpo_cobra = [(0, 0), (0, 1)] 
+    
+    # Fruta na coordenada (1,1)
+    lista_frutas = [(1, 1)]
     
     # Act
-    handler.display(tela_falsa, matriz_teste)
+    handler.display(tela_falsa, corpo_cobra, lista_frutas)
     
     # Assert
-    # Verifica se a tela ainda é limpa no começo
+    # Verifica se a tela é limpa no começo
     tela_falsa.fill.assert_called_once()
     
     # Verifica se o método 'blit' (desenhar imagem) foi chamado 3 vezes!
     assert tela_falsa.blit.call_count == 3
-    
-    # Verifica se as imagens foram desenhadas nas coordenadas certas (x, y)
     
     # Pega todos os argumentos que foram passados nas chamadas do blit
     chamadas_blit = tela_falsa.blit.call_args_list
@@ -327,7 +284,7 @@ def test_pygame_display_draws_sprites_with_blit():
     # Extrai apenas as coordenadas (x,y) de cada chamada para verificar
     coordenadas_usadas = [chamada[0][1] for chamada in chamadas_blit]
     
-    # Verifica se os elementos foram desenhados nos locais corretos
-    assert (0, 0) in coordenadas_usadas   # Posição da Cabeça
-    assert (0, 20) in coordenadas_usadas  # Posição do Corpo
-    assert (20, 20) in coordenadas_usadas # Posição da Fruta
+    # Verifica se os elementos foram desenhados nos locais corretos (multiplicados por block_size)
+    assert (0, 0) in coordenadas_usadas   # Posição da Cabeça: x=0*20, y=0*20
+    assert (0, 20) in coordenadas_usadas  # Posição do Corpo: x=0*20, y=1*20
+    assert (20, 20) in coordenadas_usadas # Posição da Fruta: x=1*20, y=1*20

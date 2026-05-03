@@ -1,127 +1,63 @@
-import os
-import random
-import keyboard
-import time
+import pygame
 
-from snake_control import Snake
-
-
-class io_handler:
-    
-    x_size: int
-    y_size: int
-    game_speed = float
-    last_input: str
-    matrix = []
-
-    def __init__(self, dim, speed):
-        self.x_size = dim[0]
-        self.y_size = dim[1]
+class PygameHandler:
+    def __init__(self, x_size, y_size, block_size):
+        self.x_size = x_size
+        self.y_size = y_size
+        self.block_size = block_size
+        self.last_input = 'd'
         
-        self.game_speed = speed
-        self.last_input = 'w'
+        # Mapeamento de teclas do Pygame para o formato de entrada do jogo
+        self.key_map = {
+            pygame.K_w: 'w', pygame.K_UP: 'w',
+            pygame.K_s: 's', pygame.K_DOWN: 's',
+            pygame.K_a: 'a', pygame.K_LEFT: 'a',
+            pygame.K_d: 'd', pygame.K_RIGHT: 'd',
+            pygame.K_ESCAPE: 'end'
+        }
 
-        for i in range (self.y_size): 
-            self.matrix.append([0]*self.x_size)
+        # Coloquei um try/except para evitar que o Pytest quebre se não achar a imagem na pasta dele.
+        try:
+            self.img_head = pygame.image.load('Graphics/head_right.png')
+            self.img_body = pygame.image.load('Graphics/tail_left.png')
+            self.img_fruit = pygame.image.load('Graphics/apple.png')
+            
+            # Redimensiona as imagens para caberem perfeitamente nos "quadradinhos" do jogo
+            self.img_head = pygame.transform.scale(self.img_head, (block_size, block_size))
+            self.img_body = pygame.transform.scale(self.img_body, (block_size, block_size))
+            self.img_fruit = pygame.transform.scale(self.img_fruit, (block_size, block_size))
+        except FileNotFoundError:
+            # Fallback de segurança exclusivo para os testes
+            self.img_head = pygame.Surface((block_size, block_size))
+            self.img_body = pygame.Surface((block_size, block_size))
+            self.img_fruit = pygame.Surface((block_size, block_size))
 
-    def record_inputs(self):
-        keyboard.add_hotkey('w', lambda: setattr(self, "last_input", 'w'))
-        keyboard.add_hotkey('a', lambda: setattr(self, "last_input", 'a'))
-        keyboard.add_hotkey('s', lambda: setattr(self, "last_input", 's'))
-        keyboard.add_hotkey('d', lambda: setattr(self, "last_input", 'd'))
-        keyboard.add_hotkey('esc', lambda: setattr(self, "last_input", 'end'))
+    def parse_event(self, event):
+        # Se for um evento de apertar tecla e estiver no nosso mapa, atualiza
+        if event.type == pygame.KEYDOWN:
+            if event.key in self.key_map:
+                self.last_input = self.key_map[event.key]
 
-    def display(self):
-        def display_h_line(self):
-            print ('+', end='')
-            print ('--'* len(self.matrix[0]), end='')
-            print ('+')
+    def display(self, screen, snake_body, fruit_list):
+        # Limpa a tela
+        screen.fill((0, 0, 0)) 
         
-        def display_content_line(line):
-            print ('|', end='')
-            for item in line: 
-                if item == 1:
-                    print ('[]', end='')
-                elif item == 2:
-                    print ('<>', end='')
-                elif item == 3:
-                    print ('()', end='')
-                else:
-                    print ('  ', end='')
-
-            print ('|')
-
-        os.system('cls' if os.name == 'nt' else 'clear')
-        display_h_line(self)
-        for line in self.matrix:
-            display_content_line(line)
-        display_h_line(self)
-
-### exemplo do uso da classe io_handler  
-#instance = io_handler((10,15), 0.5)
-#instance.matrix[0][0] = 1 #corpo
-#instance.matrix[0][1] = 2 #cabeça
-#instance.matrix[0][2] = 3 #fruta
-
-def process_turn(snake, display_handler, fruit_list):
-    if display_handler.last_input == 'end':
-        return True
-
-    snake.move(display_handler.last_input, display_handler.x_size, display_handler.y_size)
-    display_handler.matrix = [[0] * display_handler.x_size for _ in range(display_handler.y_size)]
-
-    if snake.body[0] in fruit_list:
-        snake.grow()
-        fruit_list.remove(snake.body[0]) # Remove a fruta específica que foi comida
-
-    for f_x, f_y in fruit_list:
-        if f_x >= 0 and f_y >= 0: # Checagem de segurança
-            display_handler.matrix[f_y][f_x] = 3 # Marca as frutas na matriz
-
-    for index, part in enumerate(snake.body):
-        p_x, p_y = part
-        if index == 0:
-            display_handler.matrix[p_y][p_x] = 2 # Cabeça
+        # Desenha todas as frutas
+        for f_x, f_y in fruit_list:
+            coordenada = (f_x * self.block_size, f_y * self.block_size)
+            screen.blit(self.img_fruit, coordenada)
+            
+        # Desenha a cobra a partir da lista do corpo
+        for index, (p_x, p_y) in enumerate(snake_body):
+            coordenada = (p_x * self.block_size, p_y * self.block_size)
+            
+            if index == 0:
+                screen.blit(self.img_head, coordenada) # Cabeça
+            else:
+                screen.blit(self.img_body, coordenada) # Corpo
+                
+        # Atualiza a tela
+        if not isinstance(screen, type(pygame.Surface((1,1)))): 
+            pass
         else:
-            display_handler.matrix[p_y][p_x] = 1 # Corpo
-
-    if snake.check_collision():
-        return True
-    return False
-
-def manage_fruits(snake, fruit_list, max_x, max_y):
-    limit_T = snake.get_allowed_fruits() - len(fruit_list)
-
-    total_spaces = max_x * max_y
-    occupied_spaces = len(snake.body) + len(fruit_list)
-    free_spaces = total_spaces - occupied_spaces
-
-    limit = min(limit_T, free_spaces)
-    
-    # Enquanto faltar fruta na tela, gera novas!
-    while limit > 0:
-        new_fruit = (random.randint(0, max_x - 1), random.randint(0, max_y - 1))
-        if new_fruit not in snake.body and new_fruit not in fruit_list:
-            fruit_list.append(new_fruit)
-            limit -= 1
-
-def game_loop():
-    instance = io_handler((10,10), 0.5)
-    instance.record_inputs()
-    player = Snake(start_x=5, start_y=5)
-    
-    fruit_list = []
-
-    while True:
-        manage_fruits(player, fruit_list, instance.x_size, instance.y_size)
-
-        game_over = process_turn(player, instance, fruit_list)
-        if game_over:
-            print("Você perdeu!")
-            break
-        instance.display()
-        print("mova com WASD, saia com esc. Ultimo botão:", instance.last_input)
-        time.sleep(instance.game_speed)
-
-#Comente o game_loop() para rodar os testes sem iniciar o jogo
-#game_loop()
+            pygame.display.flip()
