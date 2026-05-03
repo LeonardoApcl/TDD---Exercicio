@@ -94,7 +94,7 @@ def get_sprite_name(corpo, index):
         is_up = (y - 1) in vizinhos_y
         is_down = (y + 1) in vizinhos_y
 
-        if is_up and is_left: return "body_bottomleft"
-        if is_up and is_right: return "body_bottomright"
-        if is_down and is_left: return "body_topleft"
-        if is_down and is_right: return "body_topright"
+        if is_up and is_left: return "body_topleft"
+        if is_up and is_right: return "body_topright"
+        if is_down and is_left: return "body_bottomleft"
+        if is_down and is_right: return "body_bottomright"
