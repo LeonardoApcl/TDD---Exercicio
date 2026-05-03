@@ -287,4 +287,21 @@ def test_pygame_display_draws_sprites_with_blit():
     # Verifica se os elementos foram desenhados nos locais corretos (multiplicados por block_size)
     assert (0, 0) in coordenadas_usadas   # Posição da Cabeça: x=0*20, y=0*20
     assert (0, 20) in coordenadas_usadas  # Posição do Corpo: x=0*20, y=1*20
-    assert (20, 20) in coordenadas_usadas # Posição da Fruta: x=1*20, y=1*20
+    assert (20, 20) in coordenadas_usadas # Posição da Fruta: x=1*20, y=1*
+
+# Testes para usar as sprites corretas de acordo com a direção
+from snake_screen import get_sprite_name 
+
+@pytest.mark.parametrize("corpo, sprite_esperado", [
+    ([(5, 4), (5, 5)], "head_up"),    # Cabeça em y=4, pescoço em y=5 (Subindo)
+    ([(5, 6), (5, 5)], "head_down"),  # Cabeça em y=6, pescoço em y=5 (Descendo)
+    ([(6, 5), (5, 5)], "head_right"), # Cabeça em x=6, pescoço em x=5 (Indo para a direita)
+    ([(4, 5), (5, 5)], "head_left"),  # Cabeça em x=4, pescoço em x=5 (Indo para a esquerda)
+])
+def test_sprite_cabeca(corpo, sprite_esperado):
+    # Act
+    # Pede o sprite para o index 0 (Cabeça)
+    resultado = get_sprite_name(corpo, index=0)
+    
+    # Assert
+    assert resultado == sprite_esperado
