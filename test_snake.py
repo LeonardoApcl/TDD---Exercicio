@@ -264,9 +264,9 @@ def test_manage_fruits_does_not_add_duplicate_fruits():
     assert len(fruit_list) == 1
     assert fruit_list[0] == (10, 0) # A fruta existente deve permanecer inalterada
 
-# ------ Testes Com o Pygame ------
+#------------------------------ Testes Com o Pygame ------------------------------
 import pygame
-from unittest.mock import Mock
+from unittest.mock import Mock, MagicMock
 
 @pytest.mark.parametrize("pygame_key, expected_direction", [
     (pygame.K_UP, 'w'),
@@ -293,3 +293,41 @@ def test_pygame_input_translation(pygame_key, expected_direction):
     
     # Assert
     assert tela_pygame.last_input == expected_direction # Verifica se a saída bate
+
+def test_pygame_display_draws_sprites_with_blit():
+    # Arrange
+    from snake_pygame import PygameHandler
+    tamanho_bloco = 20
+    handler = PygameHandler(x_size=2, y_size=2, block_size=tamanho_bloco)
+    
+    # Cria uma tela falsa (Mock)
+    tela_falsa = MagicMock() 
+    
+    # Matriz 2x2: Cabeça(2) em cima, Corpo(1) e Fruta(3) embaixo
+    matriz_teste = [
+        [2, 0],
+        [1, 3]
+    ]
+    
+    # Act
+    handler.display(tela_falsa, matriz_teste)
+    
+    # Assert
+    # Verifica se a tela ainda é limpa no começo
+    tela_falsa.fill.assert_called_once()
+    
+    # Verifica se o método 'blit' (desenhar imagem) foi chamado 3 vezes!
+    assert tela_falsa.blit.call_count == 3
+    
+    # Verifica se as imagens foram desenhadas nas coordenadas certas (x, y)
+    
+    # Pega todos os argumentos que foram passados nas chamadas do blit
+    chamadas_blit = tela_falsa.blit.call_args_list
+    
+    # Extrai apenas as coordenadas (x,y) de cada chamada para verificar
+    coordenadas_usadas = [chamada[0][1] for chamada in chamadas_blit]
+    
+    # Verifica se os elementos foram desenhados nos locais corretos
+    assert (0, 0) in coordenadas_usadas   # Posição da Cabeça
+    assert (0, 20) in coordenadas_usadas  # Posição do Corpo
+    assert (20, 20) in coordenadas_usadas # Posição da Fruta
