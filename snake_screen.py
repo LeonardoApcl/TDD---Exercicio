@@ -52,7 +52,7 @@ class PygameHandler:
         # Desenha a Cobra Dinamicamente!
         for index, (p_x, p_y) in enumerate(snake_body):
             coordenada = (p_x * self.block_size, p_y * self.block_size)
-            nome_correto = get_sprite_name(snake_body, index)
+            nome_correto = get_sprite_name(snake_body, index, self.x_size, self.y_size)
             
             # Um pequeno fallback de segurança (se a função não souber o que é, desenha horizontal)
             if not nome_correto or nome_correto not in self.sprites:
@@ -66,29 +66,31 @@ class PygameHandler:
         else:
             pygame.display.flip()
 
-def get_sprite_name(corpo, index):
+def get_sprite_name(corpo, index, max_x, max_y):
+    # Lógica da Cabeça
     if index == 0:
         head_x, head_y = corpo[0]
         neck_x, neck_y = corpo[1]
 
-        # Compara a cabeça com o pescoço
-        if head_y < neck_y: return "head_up"
-        if head_y > neck_y: return "head_down"
-        if head_x > neck_x: return "head_right"
-        if head_x < neck_x: return "head_left"
+        # Compara usando a volta do mapa (módulo)
+        if head_x == (neck_x + 1) % max_x: return "head_right"
+        if head_x == (neck_x - 1) % max_x: return "head_left"
+        if head_y == (neck_y + 1) % max_y: return "head_down"
+        if head_y == (neck_y - 1) % max_y: return "head_up"
 
+    # Lógica da Cauda
     elif index == len(corpo) - 1:
         tail_x, tail_y = corpo[index]
-        front_x, front_y = corpo[index - 1] # A parte do corpo que está ligada à cauda
+        front_x, front_y = corpo[index - 1]
 
-        # Compara a ponta da cauda com o bloco da frente
-        if tail_y < front_y: return "tail_up"
-        if tail_y > front_y: return "tail_down"
-        if tail_x > front_x: return "tail_right"
-        if tail_x < front_x: return "tail_left"
+        # A ponta da cauda aponta para o lado oposto ao bloco da frente
+        if tail_x == (front_x - 1) % max_x: return "tail_left"
+        if tail_x == (front_x + 1) % max_x: return "tail_right"
+        if tail_y == (front_y - 1) % max_y: return "tail_up"
+        if tail_y == (front_y + 1) % max_y: return "tail_down"
 
+    # Lógica do Corpo e Curvas
     else:
-        # Pega a coordenada atual e as coordenadas dos dois vizinhos (anterior e próximo)
         x, y = corpo[index]
         prev_x, prev_y = corpo[index - 1]
         next_x, next_y = corpo[index + 1]
@@ -99,14 +101,14 @@ def get_sprite_name(corpo, index):
         # Se o Y de ambos os vizinhos for igual, é uma linha reta horizontal
         if prev_y == next_y: return "body_horizontal"
 
-        # Se não é reta, é curva! Vamos verificar em quais posições os vizinhos estão:
+        # Vizinhança com cálculos de borda (wrap-around)
         vizinhos_x = (prev_x, next_x)
         vizinhos_y = (prev_y, next_y)
 
-        is_left = (x - 1) in vizinhos_x
-        is_right = (x + 1) in vizinhos_x
-        is_up = (y - 1) in vizinhos_y
-        is_down = (y + 1) in vizinhos_y
+        is_left = ((x - 1) % max_x) in vizinhos_x
+        is_right = ((x + 1) % max_x) in vizinhos_x
+        is_up = ((y - 1) % max_y) in vizinhos_y
+        is_down = ((y + 1) % max_y) in vizinhos_y
 
         if is_up and is_left: return "body_topleft"
         if is_up and is_right: return "body_topright"

@@ -301,7 +301,7 @@ from snake_screen import get_sprite_name
 def test_sprite_cabeca(corpo, sprite_esperado):
     # Act
     # Pede o sprite para o index 0 (Cabeça)
-    resultado = get_sprite_name(corpo, index=0)
+    resultado = get_sprite_name(corpo, index=0, max_x=10, max_y=10)
     
     # Assert
     assert resultado == sprite_esperado
@@ -326,7 +326,7 @@ def test_sprite_cabeca(corpo, sprite_esperado):
 ])
 def test_sprite_corpo_curvas(corpo, index_alvo, sprite_esperado):
     # Act
-    resultado = get_sprite_name(corpo, index=index_alvo)
+    resultado = get_sprite_name(corpo, index=index_alvo, max_x=10, max_y=10)
     
     # Assert
     assert resultado == sprite_esperado
@@ -340,7 +340,7 @@ def test_sprite_corpo_curvas(corpo, index_alvo, sprite_esperado):
 def test_sprite_cauda(corpo, sprite_esperado):
     # Act
     ultimo_index = len(corpo) - 1
-    resultado = get_sprite_name(corpo, index=ultimo_index)
+    resultado = get_sprite_name(corpo, index=ultimo_index, max_x=10, max_y=10)
     
     # Assert
     assert resultado == sprite_esperado
@@ -435,7 +435,7 @@ def test_pygame_handler_loads_images_into_dictionary(mock_load, mock_scale):
     
     # 3. Corpo fazendo uma curva EXATAMENTE na borda (Cabeça em 0,5 | Curva em 9,5 | Cauda em 9,4)
     # A cobra vinha descendo pela direita e virou para atravessar a parede!
-    ([(0, 5), (9, 5), (9, 4)], 1, "body_topleft"), 
+    ([(0, 5), (9, 5), (9, 4)], 1, "body_topright"), 
 ])
 def test_sprite_wall_wrapping(corpo, index, sprite_esperado):
     # Act: dimensões de um mapa 10x10
