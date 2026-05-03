@@ -423,3 +423,23 @@ def test_pygame_handler_loads_images_into_dictionary(mock_load, mock_scale):
     # Garante que os valores receberam a imagem processada
     assert handler.sprites['head_up'] == "Imagem_Escalonada_Mock"
     assert handler.sprites['apple'] == "Imagem_Escalonada_Mock"
+
+@pytest.mark.parametrize("corpo, index, sprite_esperado", [
+    # --- Atravessando as bordas (Mapa 10x10) ---
+    
+    # 1. Cabeça cruzando da direita (x=9) para a esquerda (x=0)
+    ([(0, 5), (9, 5)], 0, "head_right"), 
+    
+    # 2. Cauda sendo puxada da esquerda (x=0) para a direita (x=9)
+    ([(0, 5), (9, 5)], 1, "tail_left"),  
+    
+    # 3. Corpo fazendo uma curva EXATAMENTE na borda (Cabeça em 0,5 | Curva em 9,5 | Cauda em 9,4)
+    # A cobra vinha descendo pela direita e virou para atravessar a parede!
+    ([(0, 5), (9, 5), (9, 4)], 1, "body_topleft"), 
+])
+def test_sprite_wall_wrapping(corpo, index, sprite_esperado):
+    # Act: dimensões de um mapa 10x10
+    resultado = get_sprite_name(corpo, index, max_x=10, max_y=10)
+    
+    # Assert
+    assert resultado == sprite_esperado
