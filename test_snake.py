@@ -344,3 +344,18 @@ def test_sprite_cauda(corpo, sprite_esperado):
     
     # Assert
     assert resultado == sprite_esperado
+
+def test_pygame_handler_loads_all_sprites():
+    handler = PygameHandler(x_size=10, y_size=10, block_size=20)
+    
+    # Assert
+    esperados = [
+        'head_up', 'head_down', 'head_left', 'head_right',
+        'tail_up', 'tail_down', 'tail_left', 'tail_right',
+        'body_vertical', 'body_horizontal',
+        'body_topleft', 'body_topright', 'body_bottomleft', 'body_bottomright',
+        'apple'
+    ]
+    
+    for nome in esperados:
+        assert nome in handler.sprites # O dicionário deve conter todas estas chaves!
