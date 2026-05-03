@@ -123,4 +123,5 @@ def game_loop():
         print("mova com WASD, saia com esc. Ultimo botão:", instance.last_input)
         time.sleep(instance.game_speed)
 
-game_loop()
+#Comente o game_loop() para rodar os testes sem iniciar o jogo
+#game_loop()

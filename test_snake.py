@@ -231,7 +231,7 @@ def test_manage_fruits_respects_allowed_rule():
     # A função deve ter gerado e adicionado +1 fruta nova na lista
     assert len(fruit_list) == 2
 
-#Teste (Red)
+#Teste (Green)
 def test_manage_fruits_does_not_make_fruits_when_position_is_invalid():
     player = Snake(start_x=0, start_y=0) 
     player.body = [(0,0),(0,1),(1,1)] 
@@ -246,6 +246,7 @@ def test_manage_fruits_does_not_make_fruits_when_position_is_invalid():
     assert len(fruit_list) == 1
     assert fruit_list[0] == (1, 0) # A única posição válida para a fruta é (1,0) porque as outras estão ocupadas pelo corpo da cobra
 
+# Teste (Green)
 def test_manage_fruits_does_not_add_duplicate_fruits():
     player = Snake(start_x=0, start_y=0) 
     player.body = [
@@ -262,3 +263,33 @@ def test_manage_fruits_does_not_add_duplicate_fruits():
     # A função deve tentar adicionar uma fruta nova, mas como a única posição válida já tem uma fruta, ela não deve adicionar nada
     assert len(fruit_list) == 1
     assert fruit_list[0] == (10, 0) # A fruta existente deve permanecer inalterada
+
+# ------ Testes Com o Pygame ------
+import pygame
+from unittest.mock import Mock
+
+@pytest.mark.parametrize("pygame_key, expected_direction", [
+    (pygame.K_UP, 'w'),
+    (pygame.K_w, 'w'),
+    (pygame.K_DOWN, 's'),
+    (pygame.K_s, 's'),
+    (pygame.K_LEFT, 'a'),
+    (pygame.K_a, 'a'),
+    (pygame.K_RIGHT, 'd'),
+    (pygame.K_d, 'd'),
+    (pygame.K_ESCAPE, 'end')
+])
+def test_pygame_input_translation(pygame_key, expected_direction):
+    # Arrange
+    mock_event = Mock()
+    mock_event.type = pygame.KEYDOWN
+    mock_event.key = pygame_key # Usa a chave injetada pelo Pytest
+    
+    from snake_pygame import PygameHandler
+    tela_pygame = PygameHandler(x_size=10, y_size=10, block_size=20)
+    
+    # Act
+    tela_pygame.parse_event(mock_event)
+    
+    # Assert
+    assert tela_pygame.last_input == expected_direction # Verifica se a saída bate
